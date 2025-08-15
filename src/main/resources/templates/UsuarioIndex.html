@@ -1,0 +1,56 @@
+
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    </head>
+    <body>
+        <div class="container">
+            
+            <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario = 0)}" class="btn btn-outline-primary"><i class="bi bi-person-add"></i>Nuevo Usuario</a>
+            <hr>
+            <table class="table table-hover">
+                <thead>
+                    <tr class="table-dark">
+                        <th scope="col-1" class="col-sm col-md col-lg col-xl">#</th>
+                        <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Nombre</em></th>
+                        <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Contacto</em></th>
+                        <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Datos Personales</em></th>
+                        <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>UserName</em></th>
+                        
+                        <th scope="col-3" class="col-sm col-md col-lg col-xl"><em>Direccion</em></th>  
+                        <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>Rol</em></th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario : ${usuarios}">
+                        <td><a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a class="btn btn-outline-danger"><i class="bi bi-trash"></i></a></td>
+                        <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                        <td th:text="|Tel: ${usuario.Celular} Cel:${usuario.Telefono}|"></td>
+                        <td th:text="|${usuario.Email}, ${usuario.CURP}, ${usuario.FechaNacimiento}|"></td>
+                        <td th:text="|${usuario.UserName}|"></td>
+                       
+                        
+                        <td >
+                            <ul>
+                                <li th:each="direccion : ${usuario.Direcciones}" th:text="|${direccion.Calle} ${direccion.NumeroExterior} ${direccion.NumeroInterior} ${direccion.colonia.Nombre} ${direccion.colonia.CodigoPostal} ${direccion.colonia.Municipio.Nombre} ${direccion.colonia.Municipio.Estado.Nombre} ${direccion.colonia.Municipio.Estado.Pais.Nombre}|"></li>
+                            
+                            </ul>
+                            
+                        </td>
+                         <td th:each="rol : ${usuario.Rol}" th:text="|${rol.Nombre}|"></td>
+
+
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </body>
+</html>
