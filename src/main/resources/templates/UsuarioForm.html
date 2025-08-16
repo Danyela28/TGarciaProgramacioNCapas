@@ -26,7 +26,8 @@
                 <input type="hidden" th:field="*{IdUsuario}">
                 <input type="hidden" th:field="*{Direcciones[0].IdDireccion}">
 
-                <div class="row">
+                <div class="row" th:if="*{(IdUsuario ==0 && Direcciones[0].IdDireccion == 0)
+                     || (IdUsuario >0 && Direcciones[0].IdDireccion == -1)}">
                     <div class="col-md-12">
                         <div class="card p-3 h-100 text-bg-dark">
                             <div class="mb-3">

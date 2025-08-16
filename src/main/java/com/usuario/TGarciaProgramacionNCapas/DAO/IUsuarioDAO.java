@@ -11,5 +11,6 @@ public interface IUsuarioDAO {
     Result DireccionGetByIdUsuario(int idUsuario);
     Result UsuarioDireccionAdd(Usuario usuario);
     Result UsuarioUpDate(Usuario usuario);
+    Result UsuarioAddDireccion(Usuario usuario);
     
 }

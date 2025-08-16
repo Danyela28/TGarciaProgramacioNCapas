@@ -294,6 +294,34 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
 
         return result;
     }
+    @Override
+    public Result UsuarioAddDireccion(Usuario usuario) {
+        Result result = new Result();
+        try {
+            result.correct = jdbcTemplate.execute("CALL UsuarioAddDireccion(?, ?, ?, ?, ?, ?)",
+                    (CallableStatementCallback<Boolean>) callableStatement -> {
+
+                        callableStatement.setInt(1, usuario.getIdUsuario());
+                        callableStatement.setString(2, usuario.Direcciones.get(0).getCalle());
+                        callableStatement.setString(3, usuario.Direcciones.get(0).getNumeroInterior());
+                        callableStatement.setString(4, usuario.Direcciones.get(0).getNumeroExterior());
+                        callableStatement.setInt(5, usuario.Direcciones.get(0).colonia.getIdColonia());
+
+                        int isCorrect = callableStatement.executeUpdate();
+                        if (isCorrect == -1) {
+                            return true;
+
+                        }
+                        return false;
+                    });
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+
 
 }
 
