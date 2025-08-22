@@ -41,12 +41,14 @@ public class Usuario {
     @Size(min = 10, max = 18, message = "Texto de entre 18 caracteres")
     @NotEmpty(message = "Informacion necesaria")
     private String CURP;
+    
     public Rol Rol;
 
     /**
      *
      */
     public List<Direccion>Direcciones;
+    private String Imagen;
 
     
     
@@ -179,6 +181,14 @@ public class Usuario {
 
     public void setRol(Rol Rol) {
         this.Rol = Rol;
+    }
+
+    public String getImagen() {
+        return Imagen;
+    }
+
+    public void setImagen(String Imagen) {
+        this.Imagen = Imagen;
     }
 
     

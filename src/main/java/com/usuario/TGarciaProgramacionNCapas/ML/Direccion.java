@@ -7,9 +7,13 @@ public class Direccion {
     private String NumeroInterior;
     private String NumeroExterior;
     public Colonia colonia;
+
+    public Direccion(int IdDireccion) {
+        this.IdDireccion = IdDireccion;
+    }
+
    
-   
-    
+    public Direccion(){}
     
     public int getIdDireccion() {
         return IdDireccion;

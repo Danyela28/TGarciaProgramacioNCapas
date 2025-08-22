@@ -6,11 +6,33 @@ import com.usuario.TGarciaProgramacionNCapas.DAO.MunicipioDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.PaisDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.RolDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.UsuarioDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.ML.Colonia;
 import com.usuario.TGarciaProgramacionNCapas.ML.Direccion;
+import com.usuario.TGarciaProgramacionNCapas.ML.ErrorCM;
 import com.usuario.TGarciaProgramacionNCapas.ML.Result;
+import com.usuario.TGarciaProgramacionNCapas.ML.Rol;
 import com.usuario.TGarciaProgramacionNCapas.ML.Usuario;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +44,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("usuario")
@@ -85,25 +108,35 @@ public class UsuarioController {
     public String formEditable(
             @RequestParam int IdUsuario,
             @RequestParam(required = false) Integer IdDireccion,
-            Model model){
-
+            Model model) {
 
 ///---Editar Usuario------------
-        if(IdDireccion == null){
-            Result result = usuarioDAOImplementation.DireccionGetByIdUsuario(IdUsuario);
-            if(result.correct){
-                model.addAttribute("Usuario", result.object);
-            }else{
-                model.addAttribute("Usuario", new Usuario());
+        if (IdDireccion == null) {
+            Result result = usuarioDAOImplementation.UsuarioGetById(IdUsuario);
+
+            if (result.correct && result.object != null) {
+                Usuario usuario = (Usuario) result.object;
+
+                if (usuario.getDirecciones() == null) {
+                    usuario.setDirecciones(new ArrayList<>());
+                }
+
+                usuario.getDirecciones().add(new Direccion(-1));
+                model.addAttribute("Usuario", usuario);
+                model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
+            } else {
+                model.addAttribute("error", "No se pudo cargar la información del usuario");
+                return "Error";
             }
-//-----------Agregar Dirección---------------------
-        } else if (IdDireccion == 0) {
-        
-        Usuario usuario = new Usuario();
-        usuario.setIdUsuario(IdUsuario);
-        model.addAttribute("Usuario", usuario);
+        } //-----------Agregar Dirección---------------------
+        else if (IdDireccion == 0) {
+
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(IdUsuario);
+            model.addAttribute("Usuario", usuario);
         }
- /* -----------Editar Dirección---------------------      
+
+        /* -----------Editar Dirección---------------------      
         } else {
         Result result = usuarioDAOImplementation.DireccionGetById(IdDireccion);
         if (result.correct) {
@@ -115,49 +148,243 @@ public class UsuarioController {
             model.addAttribute("Usuario", new Usuario());
         }
     }*/
+        model.addAttribute(
+                "paises", paisDAOImplementation.GetAllPais().objects);
+        model.addAttribute(
+                "roles", rolDAOImplementation.GetAll().objects);
 
-    model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
-    model.addAttribute("roles", rolDAOImplementation.GetAll().objects);
-    return "UsuarioForm";
-  }
+        return "UsuarioForm";
+    }
 
-
-
-@PostMapping("/action/")
-public String Add(@Valid
-@ModelAttribute("Usuario") Usuario usuario,
-            BindingResult bindingResult, Model model) {
+    @PostMapping("add")
+    public String Add(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult,
+            Model model,
+            @RequestParam("imagenFile") MultipartFile imagen) {
 
         if (bindingResult.hasErrors()) {
+            //llenar lo de paises
             model.addAttribute("Usuario", usuario);
             return "UsuarioForm";
         } else {
-            Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
-            return "redirect:/usuario";
-
+            if (imagen != null) {
+                String nombre = imagen.getOriginalFilename();
+                String extension = nombre.split("\\.")[1];
+                if (extension.equals("jpg"))
+                    try {
+                    byte[] bytes = imagen.getBytes();
+                    String base64Image = Base64.getEncoder().encodeToString(bytes);
+                    usuario.setImagen(base64Image);
+                } catch (Exception ex) {
+                    System.out.println("error");
+                }
+            }
         }
+        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
+        return "redirect:/usuario";
+
     }
+
     @GetMapping("getEstadosByIdPais/{IdPais}")
-@ResponseBody
-public Result EstadoByPais(@PathVariable int IdPais){
-        
+    @ResponseBody
+    public Result EstadoByPais(@PathVariable int IdPais
+    ) {
+
         return estadoDAOImplementation.EstadoByPais(IdPais);
     }
-    
+
     @GetMapping("getMunicipiosByIdEstado/{IdEstado}")
-@ResponseBody
-public Result MunicipioByEstado (@PathVariable int IdEstado){
-        
+    @ResponseBody
+    public Result MunicipioByEstado(@PathVariable int IdEstado
+    ) {
+
         return municipioDAOImplementation.MunicipioByEstado(IdEstado);
     }
-    
+
     @GetMapping("getColoniasByIdMunicipio/{IdMunicipio}")
-@ResponseBody
-public Result ColoniaByMunicipio (@PathVariable int IdMunicipio){
-        
+    @ResponseBody
+    public Result ColoniaByMunicipio(@PathVariable int IdMunicipio
+    ) {
+
         return coloniaDAOImplementation.ColoniaByMunicipio(IdMunicipio);
     }
-            }
-    
 
-    
+    @GetMapping("cargamasiva")
+    public String CargaMasiva() {
+        return "CargaMasiva";
+    }
+
+    @PostMapping("cargamasiva")
+    public String CargaMasiva(@RequestParam("archivo") MultipartFile file, Model model, HttpSession session) {
+
+        String root = System.getProperty("user.dir");
+        String rutaArchivo = "/src/main/resources/archivos/";
+        String fechaSubida = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmSS"));
+        String rutaFinal = root + rutaArchivo + fechaSubida + file.getOriginalFilename();
+
+        try {
+            file.transferTo(new File(rutaFinal));
+        } catch (Exception ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+        if (file.getOriginalFilename().split("\\.")[1].equals("txt")) {
+            List<Usuario> usuarios = ProcesarTXT(new File(rutaFinal));
+            List<ErrorCM> errores = ValidarDatos(usuarios);
+
+            if (errores.isEmpty()) {
+                model.addAttribute("listarErrores", errores);
+                model.addAttribute("archivoCorrecto", true);
+                session.setAttribute("path", rutaFinal); //no regresa a la vista
+
+            } else {
+                model.addAttribute("listarErrores", errores);
+                model.addAttribute("archivoCorrecto", false);
+            }
+        } else {
+            //excel
+            List<Usuario> usuarios = ProcesarExcel(new File(rutaFinal));
+            List<ErrorCM> errores = ValidarDatos(usuarios);
+
+            if (errores.isEmpty()) {
+                model.addAttribute("listarErrores", errores);
+                model.addAttribute("archivoCorrecto", true);
+                session.setAttribute("path", rutaFinal);
+            } else {
+                model.addAttribute("listarErrores", errores);
+                model.addAttribute("archivoCorrecto", false);
+            }
+        }
+        return "CargaMasiva";
+    }
+
+    @GetMapping("cargamasiva/procesar")
+    public String CargaMasiva(HttpSession session) {
+        try {
+
+            String ruta = session.getAttribute("path").toString();
+
+            List<Usuario> usuarios;
+
+            if (ruta.split("\\.")[1].equals("txt")) {
+                System.out.println("soy un txt");
+                usuarios = ProcesarTXT(new File(ruta));
+            } else {
+                usuarios = ProcesarExcel(new File(ruta));
+            }
+
+            for (Usuario usuario : usuarios) {
+                usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
+            }
+
+            session.removeAttribute("path");
+
+        } catch (Exception ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+
+        return "redirect:/usuario";
+
+    }
+
+    private List<Usuario> ProcesarTXT(File file) {
+        try {
+            System.out.println("test");
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+
+            String linea = "";
+            List<Usuario> usuarios = new ArrayList<>();
+            while ((linea = bufferedReader.readLine()) != null) {
+                System.out.println(linea);
+                String[] campos = linea.split("\\|");
+                Usuario usuario = new Usuario();
+                usuario.setNombre(campos[0]);
+                usuario.setApellidoPaterno(campos[1]);
+                usuario.setApellidoMaterno(campos[2]);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                Date fecha=campos[3]=="" ? null:format.parse(campos[3]);
+                usuario.setFechaNacimiento(fecha);
+                usuario.setCelular(campos[4]);
+                usuario.setTelefono(campos[5]);
+                usuario.setCURP(campos[6]);
+                usuario.setUserName(campos[7]);
+                usuario.setEmail(campos[8]);
+                usuario.setPassword(campos[9]);
+                usuario.setSexo(campos[10]);
+                usuario.Rol = new Rol();
+                usuario.Rol.setIdRol(Integer.parseInt(campos[11]));
+                usuario.Direcciones = new ArrayList();
+                Direccion direccion = new Direccion();
+                direccion.setIdDireccion(Integer.parseInt(campos[12]));
+                direccion.setCalle(campos[13]);
+                direccion.setNumeroInterior(campos[14]);
+                direccion.setNumeroExterior(campos[15]);
+                direccion.colonia = new Colonia();
+                direccion.colonia.setIdColonia(Integer.parseInt(campos[16]));
+
+                usuarios.add(usuario);
+            }
+            System.out.println(usuarios.size());
+            return usuarios;
+        } catch (Exception ex) {
+            System.out.println(ex.getLocalizedMessage());
+            return null;
+        }
+    }
+
+   private List<Usuario> ProcesarExcel(File file) {
+
+       List<Usuario> usuarios = new ArrayList<>();
+        try 
+        {
+            XSSFWorkbook workbook = new XSSFWorkbook(file); 
+            Sheet sheet = workbook.getSheetAt(0);
+            for (Row row : sheet){
+               Usuario usuario = new Usuario();
+                usuario.setNombre(row.getCell(0) != null ? row.getCell(0).toString() : "");
+               usuario.setApellidoPaterno(row.getCell(1).toString());
+                usuario.setApellidoMaterno(row.getCell(2).toString());           
+                DataFormatter dataFormatter = new DataFormatter();
+                usuario.setCelular(row.getCell(4) != null ? dataFormatter.formatCellValue(row.getCell(4)) : "");
+                usuario.setTelefono(row.getCell(5) != null ? dataFormatter.formatCellValue(row.getCell(5)) : "");
+         
+                usuario.Rol = new Rol();
+               usuario.Rol.setIdRol(row.getCell(4) != null ? (int) row.getCell(3).getNumericCellValue() : 0);
+
+               usuarios.add(usuario);
+           
+          }
+           
+           return usuarios;           
+       } catch (Exception ex) {
+           return null;
+        }
+    }
+   
+
+    private List<ErrorCM> ValidarDatos(List<Usuario> usuarios) {
+
+        List<ErrorCM> errores = new ArrayList<>();
+        
+
+            int linea = 1;
+            for (Usuario usuario : usuarios) {
+                System.out.println("test validar");
+                if (usuario.getNombre() == null || usuario.getNombre() == "") {
+                    errores.add(new ErrorCM(linea, usuario.getNombre(), "Campo obligatorio"));
+                }
+                if (usuario.getApellidoPaterno() == null || usuario.getApellidoPaterno() == "") {
+                    errores.add(new ErrorCM(linea, usuario.getApellidoPaterno(), "Apellido Paterno  Obligatorio"));
+                }
+                if(usuario.getFechaNacimiento()==null || usuario.getFechaNacimiento().equals("")){
+                    errores.add(new ErrorCM(linea, "fecha vacia", "El campo Fecha de Nacimiento es obligatorio"));
+                }
+                if (usuario.Rol.getIdRol() == 0) {
+                    errores.add(new ErrorCM(linea, usuario.Rol.getIdRol() + "", "Numero de Rol no valido "));
+                }
+
+                linea++;
+            }
+       
+
+        return errores;
+    }
+}
