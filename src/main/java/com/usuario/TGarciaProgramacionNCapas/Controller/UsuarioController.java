@@ -70,8 +70,9 @@ public class UsuarioController {
 
     @GetMapping
     public String Index(Model model) {
-        Result result = usuarioDAOImplementation.UsuarioDireccionGetAll();
-
+        Result result = usuarioDAOImplementation.UsuarioDireccionGetAll(new Usuario("", "", "", new Rol()));
+        
+        model.addAttribute("alumnoBusqueda", new Usuario());
         if (result.correct) {
             model.addAttribute("usuarios", result.objects);
         } else {
@@ -79,6 +80,16 @@ public class UsuarioController {
         }
 
         return "UsuarioIndex";
+    }
+    
+    @PostMapping
+    public String Index(Model model, @ModelAttribute("usuarioBusqueda")Usuario usuarioBusqueda){
+        
+        Result result = usuarioDAOImplementation.UsuarioDireccionGetAll(usuarioBusqueda);
+        
+        model.addAttribute("usuarios", result.objects);
+        
+        return "UsaurioIndex";
     }
 
     @GetMapping("/action/{IdUsuario}")
@@ -94,7 +105,7 @@ public class UsuarioController {
             return "UsuarioForm";
         } else {
             Result result = usuarioDAOImplementation.DireccionGetByIdUsuario(IdUsuario);
-
+            
             if (result.correct) {
                 model.addAttribute("usuario", result.object);
             } else {
@@ -123,6 +134,7 @@ public class UsuarioController {
 
                 usuario.getDirecciones().add(new Direccion(-1));
                 model.addAttribute("Usuario", usuario);
+                
                 model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
             } else {
                 model.addAttribute("error", "No se pudo cargar la información del usuario");
@@ -300,7 +312,7 @@ public class UsuarioController {
                 usuario.setApellidoPaterno(campos[1]);
                 usuario.setApellidoMaterno(campos[2]);
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                Date fecha=campos[3]=="" ? null:format.parse(campos[3]);
+                Date fecha = campos[3] == "" ? null : format.parse(campos[3]);
                 usuario.setFechaNacimiento(fecha);
                 usuario.setCelular(campos[4]);
                 usuario.setTelefono(campos[5]);
@@ -321,6 +333,7 @@ public class UsuarioController {
                 direccion.colonia.setIdColonia(Integer.parseInt(campos[16]));
 
                 usuarios.add(usuario);
+                usuario.Direcciones.add(direccion);
             }
             System.out.println(usuarios.size());
             return usuarios;
@@ -330,60 +343,92 @@ public class UsuarioController {
         }
     }
 
-   private List<Usuario> ProcesarExcel(File file) {
+    private List<Usuario> ProcesarExcel(File file) {
 
-       List<Usuario> usuarios = new ArrayList<>();
-        try 
-        {
-            XSSFWorkbook workbook = new XSSFWorkbook(file); 
+        List<Usuario> usuarios = new ArrayList<>();
+        try {
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
             Sheet sheet = workbook.getSheetAt(0);
-            for (Row row : sheet){
-               Usuario usuario = new Usuario();
+            for (Row row : sheet) {
+                Usuario usuario = new Usuario();
                 usuario.setNombre(row.getCell(0) != null ? row.getCell(0).toString() : "");
-               usuario.setApellidoPaterno(row.getCell(1).toString());
-                usuario.setApellidoMaterno(row.getCell(2).toString());           
+                usuario.setApellidoPaterno(row.getCell(1).toString());
+                usuario.setApellidoMaterno(row.getCell(2).toString());
                 DataFormatter dataFormatter = new DataFormatter();
                 usuario.setCelular(row.getCell(4) != null ? dataFormatter.formatCellValue(row.getCell(4)) : "");
                 usuario.setTelefono(row.getCell(5) != null ? dataFormatter.formatCellValue(row.getCell(5)) : "");
-         
-                usuario.Rol = new Rol();
-               usuario.Rol.setIdRol(row.getCell(4) != null ? (int) row.getCell(3).getNumericCellValue() : 0);
 
-               usuarios.add(usuario);
-           
-          }
-           
-           return usuarios;           
-       } catch (Exception ex) {
-           return null;
+                usuario.Rol = new Rol();
+                usuario.Rol.setIdRol(row.getCell(4) != null ? (int) row.getCell(3).getNumericCellValue() : 0);
+
+                usuarios.add(usuario);
+
+            }
+
+            return usuarios;
+        } catch (Exception ex) {
+            return null;
         }
     }
-   
 
     private List<ErrorCM> ValidarDatos(List<Usuario> usuarios) {
 
         List<ErrorCM> errores = new ArrayList<>();
-        
 
-            int linea = 1;
-            for (Usuario usuario : usuarios) {
-                System.out.println("test validar");
-                if (usuario.getNombre() == null || usuario.getNombre() == "") {
-                    errores.add(new ErrorCM(linea, usuario.getNombre(), "Campo obligatorio"));
-                }
-                if (usuario.getApellidoPaterno() == null || usuario.getApellidoPaterno() == "") {
-                    errores.add(new ErrorCM(linea, usuario.getApellidoPaterno(), "Apellido Paterno  Obligatorio"));
-                }
-                if(usuario.getFechaNacimiento()==null || usuario.getFechaNacimiento().equals("")){
-                    errores.add(new ErrorCM(linea, "fecha vacia", "El campo Fecha de Nacimiento es obligatorio"));
-                }
-                if (usuario.Rol.getIdRol() == 0) {
-                    errores.add(new ErrorCM(linea, usuario.Rol.getIdRol() + "", "Numero de Rol no valido "));
-                }
-
-                linea++;
+        int linea = 1;
+        for (Usuario usuario : usuarios) {
+            System.out.println("test validar");
+            if (usuario.getNombre() == null || usuario.getNombre() == "") {
+                errores.add(new ErrorCM(linea, usuario.getNombre(), "Campo obligatorio"));
             }
-       
+            if (usuario.getApellidoPaterno() == null || usuario.getApellidoPaterno() == "") {
+                errores.add(new ErrorCM(linea, usuario.getApellidoPaterno(), "Apellido Paterno es Obligatorio"));
+            }
+            if (usuario.getApellidoMaterno() == null || usuario.getApellidoMaterno() == "") {
+                errores.add(new ErrorCM(linea, usuario.getApellidoMaterno(), "Apellido Materno es Obligatorio"));
+            }
+            if (usuario.getFechaNacimiento() == null || usuario.getFechaNacimiento().equals("")) {
+                errores.add(new ErrorCM(linea, "fecha vacia", "El campo Fecha de Nacimiento es obligatorio"));
+            }
+            if (usuario.getCelular() == null || usuario.getCelular().isEmpty()) {
+                errores.add(new ErrorCM(linea, "celular vacio", "El campo Número de Celular es obligatorio"));
+            } else if (!usuario.getCelular().matches("\\d{10}")) {
+                errores.add(new ErrorCM(linea, usuario.getCelular(), "El campo Número de Celular debe contener exactamente 10 dígitos numéricos"));
+            }
+            if (usuario.getTelefono() == null || usuario.getTelefono().isEmpty()) {
+                errores.add(new ErrorCM(linea, "telefono vacio", "El campo Número de Teléfono es obligatorio"));
+            } else if (!usuario.getTelefono().matches("\\d{10}")) {
+                errores.add(new ErrorCM(linea, usuario.getTelefono(), "El campo Número de Teléfono debe contener exactamente 10 dígitos numéricos"));
+            }
+            if (usuario.getCURP() == null || usuario.getCURP().isEmpty()) {
+                errores.add(new ErrorCM(linea, "curp vacia", "El campo CURP es obligatorio"));
+            } else if (!usuario.getCURP().matches("^[A-Z]{4}\\d{6}[H,M][A-Z]{5}[A-Za-z0-9]{2}$")) {
+                errores.add(new ErrorCM(linea, usuario.getCURP(), "El campo CURP debe contener exactamente 18 caracteres y seguir el formato correcto"));
+            }
+            if (usuario.getUserName() == null || usuario.getUserName() == "") {
+                errores.add(new ErrorCM(linea, "Sin Usuario", "Este campo es obligatorio"));
+            }
+            if (usuario.getEmail() == null || usuario.getEmail().isEmpty()) {
+                errores.add(new ErrorCM(linea, "email vacio", "El campo Email es obligatorio"));
+            } else if (!usuario.getEmail().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                errores.add(new ErrorCM(linea, usuario.getEmail(), "El campo Email debe tener el formato correcto (ej. usuario@dominio.com)"));
+            }
+            if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
+                errores.add(new ErrorCM(linea, "password vacia", "El campo Contraseña es obligatorio"));
+            } else if (!usuario.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}$")) {
+                errores.add(new ErrorCM(linea, usuario.getPassword(), "La contraseña debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula, un número y un carácter especial"));
+            }
+            if (usuario.getSexo() == null || usuario.getSexo().isEmpty()) {
+                errores.add(new ErrorCM(linea, "sexo vacio", "El campo Sexo es obligatorio"));
+            } else if (!usuario.getSexo().equalsIgnoreCase("M") && !usuario.getSexo().equalsIgnoreCase("H")) {
+                errores.add(new ErrorCM(linea, usuario.getSexo(), "El campo Sexo debe ser 'M' para Mujer o 'H' para Hombre"));
+            }
+            if (usuario.Rol.getIdRol() == 0) {
+                errores.add(new ErrorCM(linea, usuario.Rol.getIdRol() + "", "Numero de Rol no valido "));
+            }
+
+            linea++;
+        }
 
         return errores;
     }

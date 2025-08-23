@@ -5,6 +5,33 @@
     
     <body layout:fragment="body">
         <div class="container">
+            <div class="card">
+              <h5 class="card-header">Busqueda Rapida</h5>
+              <div class="card-body">
+                <form class="d-flex" role="Search">
+                    <div class="row">
+                        <div class="col-3">
+                            <input class="form-control me-2" type="Search" placeholder="Nombre" aria-label="Search">
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control me-2" type="Search" placeholder="Apellido Paterno" aria-label="Search">
+                        </div>
+                        <div class="col-3">
+                            <input class="form-control me-2" type="Search" placeholder="Apellido Materno" aria-label="Search">
+                        </div>
+                        <div class="col-3">  
+                            <button class="btn btn-outline-dark" type="submit">Buscar</button>
+                        </div>
+                </form>
+ 
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+              </div>
+            </div>
+            
+            <hr>
+
+
+            
             
             <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario = 0)}" class="btn btn-outline-primary"><i class="bi bi-person-add"></i>Nuevo Usuario</a>
             <hr>

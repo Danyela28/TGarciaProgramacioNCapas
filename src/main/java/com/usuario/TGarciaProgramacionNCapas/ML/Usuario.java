@@ -54,7 +54,6 @@ public class Usuario {
     
     
     
-    
     public Usuario(){}
     
     public Usuario(int idUsuario, String nombre, String apellidoMaterno, String apellidoPaterno, Date fechaNacimiento, int edad, double estatura, String celular,
@@ -82,6 +81,12 @@ public class Usuario {
     } 
     public int getIdUsuario(){
         return this.IdUsuario;
+    }
+    public Usuario(String Nombre, String ApellidoPaterno, String ApellidoMaterno, Rol rol){
+        this.Nombre=Nombre;
+        this.ApellidoPaterno=ApellidoPaterno;
+        this.ApellidoMaterno=ApellidoMaterno;
+        this.Rol= rol;
     }
     public void setNombre(String nombre){
         this.Nombre=nombre;
@@ -174,6 +179,8 @@ public class Usuario {
     public void setDirecciones(List<Direccion> Direcciones) {
         this.Direcciones = Direcciones;
     }
+
+   
 
     public Rol getRol() {
         return Rol;

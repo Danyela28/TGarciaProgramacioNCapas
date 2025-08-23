@@ -7,7 +7,7 @@ import com.usuario.TGarciaProgramacionNCapas.ML.Usuario;
 
 public interface IUsuarioDAO {
     
-    Result UsuarioDireccionGetAll();
+    Result UsuarioDireccionGetAll(Usuario usuario);
     Result DireccionGetByIdUsuario(int idUsuario);
     Result UsuarioDireccionAdd(Usuario usuario);
     Result UsuarioUpDate(Usuario usuario);

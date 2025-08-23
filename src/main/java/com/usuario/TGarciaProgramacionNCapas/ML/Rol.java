@@ -11,6 +11,9 @@ public class Rol {
         this.IdRol = idRol;
         this.Nombre = nombre;
     }
+    public Rol(Integer idRol){
+        this.IdRol= IdRol;
+    }
 
     public int getIdRol() {
         return IdRol;
