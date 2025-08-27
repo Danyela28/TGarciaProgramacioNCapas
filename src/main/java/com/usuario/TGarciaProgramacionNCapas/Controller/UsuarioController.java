@@ -6,6 +6,7 @@ import com.usuario.TGarciaProgramacionNCapas.DAO.MunicipioDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.PaisDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.RolDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.UsuarioDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.UsuarioJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.ML.Colonia;
 import com.usuario.TGarciaProgramacionNCapas.ML.Direccion;
 import com.usuario.TGarciaProgramacionNCapas.ML.ErrorCM;
@@ -52,7 +53,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioDAOImplementation usuarioDAOImplementation;
-
+    @Autowired
+    private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
     @Autowired
     private RolDAOImplementation rolDAOImplementation;
 
@@ -70,11 +72,17 @@ public class UsuarioController {
 
     @GetMapping
     public String Index(Model model) {
-        Result result = usuarioDAOImplementation.UsuarioDireccionGetAll(new Usuario("", "", "", new Rol()));
+//        Result result = usuarioDAOImplementation.UsuarioDireccionGetAll(new Usuario("", "", "", new Rol()));
         
-        model.addAttribute("alumnoBusqueda", new Usuario());
+       
+        Result result = usuarioJPADAOImplementation.GetAll();
+        
+        model.addAttribute("usuarioBusqueda", new Usuario());
+        
+
         if (result.correct) {
             model.addAttribute("usuarios", result.objects);
+            model.addAttribute("roles", rolDAOImplementation.GetAll().objects);
         } else {
             model.addAttribute("usuario", null);
         }
@@ -88,8 +96,9 @@ public class UsuarioController {
         Result result = usuarioDAOImplementation.UsuarioDireccionGetAll(usuarioBusqueda);
         
         model.addAttribute("usuarios", result.objects);
+        model.addAttribute("roles", rolDAOImplementation.GetAll().objects);
         
-        return "UsaurioIndex";
+        return "UsuarioIndex";
     }
 
     @GetMapping("/action/{IdUsuario}")

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,8 +26,6 @@ public class Usuario {
     @Past
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date FechaNacimiento;
-    private int Edad;
-    private double Estatura;
     @Pattern(regexp="^\\d{10}$", message = "Numero invalido")
     private String Celular;
     public String fechaStr;
@@ -43,10 +42,6 @@ public class Usuario {
     private String CURP;
     
     public Rol Rol;
-
-    /**
-     *
-     */
     public List<Direccion>Direcciones;
     private String Imagen;
 
@@ -56,23 +51,54 @@ public class Usuario {
     
     public Usuario(){}
     
-    public Usuario(int idUsuario, String nombre, String apellidoMaterno, String apellidoPaterno, Date fechaNacimiento, int edad, double estatura, String celular,
-            String userName, String email, String password, String sexo, String telefono, String curp, Rol rol){
-        this.IdUsuario=idUsuario;
-        this.Nombre=nombre;
-        this.ApellidoMaterno= apellidoMaterno;
-        this.ApellidoPaterno=apellidoPaterno;
-        this.FechaNacimiento=fechaNacimiento;
-        this.Edad=edad;
-        this.Estatura=estatura;
-        this.Celular=celular;
-        this.UserName=userName;
-        this.Email=email;
-        this.Password=password;
-        this.Sexo=sexo;
-        this.Telefono=telefono;
-        this.CURP=curp;
-        this.Rol=rol;
+    public Usuario(com.usuario.TGarciaProgramacionNCapas.JPA.Usuario usuarioJPA){
+        this.IdUsuario = usuarioJPA.getIdUsuario();
+        this.Nombre = usuarioJPA.getNombre();
+        this.ApellidoPaterno = usuarioJPA.getApellidoPaterno();
+        this.ApellidoMaterno = usuarioJPA.getApellidoMaterno();
+        this.FechaNacimiento = usuarioJPA.getFechaNacimiento();
+        this.Celular = usuarioJPA.getCelular();
+        this.UserName = usuarioJPA.getUserName();
+        this.Email = usuarioJPA.getEmail();
+        this.Password = usuarioJPA.getPassword();
+        this.Sexo = usuarioJPA.getSexo();
+        this.Telefono = usuarioJPA.getTelefono();
+        this.CURP = usuarioJPA.getCURP();
+        this.Imagen = usuarioJPA.getImagen();
+        this.Rol = new Rol();
+        this.Rol.setIdRol(usuarioJPA.Rol.getIdRol());
+        this.Rol.setNombre(usuarioJPA.Rol.getNombre());
+        if(usuarioJPA.Direcciones !=null && usuarioJPA.Direcciones.size()>0){
+            this.Direcciones = new ArrayList<>();
+            for(com.usuario.TGarciaProgramacionNCapas.JPA.Direccion Direction : usuarioJPA.Direcciones){
+                Direccion direccion = new Direccion();
+                direccion.setIdDireccion(Direction.getIdDireccion());
+                direccion.setCalle(Direction.getCalle());
+                direccion.setNumeroExterior(Direction.getNumeroExterior());
+                direccion.setNumeroInterior(Direction.getNumeroInterior());
+                
+                direccion.colonia = new Colonia();
+                direccion.colonia.setIdColonia(Direction.colonia.getIdColonia());
+                direccion.colonia.setNombre(Direction.colonia.getNombre());
+                direccion.colonia.setCodigoPostal(Direction.colonia.getCodigoPostal());
+                
+                direccion.colonia.Municipio = new Municipio();
+                direccion.colonia.Municipio.setIdMunicipio(Direction.colonia.Municipio.getIdMunicipio());
+                direccion.colonia.Municipio.setNombre(Direction.colonia.Municipio.getNombre());
+                
+                direccion.colonia.Municipio.Estado = new Estado();
+                direccion.colonia.Municipio.Estado.setIdEstado(Direction.colonia.Municipio.Estado.getIdEstado());
+                direccion.colonia.Municipio.Estado.setNombre(Direction.colonia.Municipio.Estado.getNombre());
+                
+                direccion.colonia.Municipio.Estado.Pais = new Pais();
+                direccion.colonia.Municipio.Estado.Pais.setIdPais(Direction.colonia.Municipio.Estado.Pais.getIdPais());
+                direccion.colonia.Municipio.Estado.Pais.setNombre(Direction.colonia.Municipio.Estado.Pais.getNombre());
+                
+                this.Direcciones.add(direccion);
+                
+            }
+            
+        }
         
     }
     
@@ -113,21 +139,7 @@ public class Usuario {
     public Date getFechaNacimiento(){
         return FechaNacimiento;
     }
-    public void setEdad(int edad){
-        this.Edad=edad;
-    }
-    public int getEdad(){
-        return Edad;
-    }
-
-    public double getEstatura() {
-        return Estatura;
-    }
-
-    public void setEstatura(double Estatura) {
-        this.Estatura = Estatura;
-    }
-
+    
     public String getCelular() {
         return Celular;
     }

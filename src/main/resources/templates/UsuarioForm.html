@@ -160,7 +160,7 @@
                                         <label class="form-label fw-bold" for="inlineFormSelectColonia">ROL</label>
                                         <select class="form-select" id="inlineFormSelectColonia">
                                             <option value=0 selected>Selecciona...</option>
-                                            <option th:each="rol : ${roles}" th:text="${rol.nombre}" th:value="${rol.IdRol}" th:field="*{rol.IdRol}">One</option>
+                                            <option th:each="rol : ${roles}" th:text="${rol.nombre}" th:value="${rol.IdRol}" th:field="*{Rol.IdRol}">One</option>
                                         </select>
                                     </div>
                                 </div>
@@ -169,11 +169,11 @@
                     </div>
 
                     <hr>
-                    <p class="fw-bold text-uppercase fs-3 text-center">DIRECCION</p>
-
+                   
+                    
                     <div class="card p-3 h-3 text-bg-dark" th:if="*{(IdUsuario >0 && Direcciones[0].IdDireccion > 0)
                          || (IdUsuario >0 && Direcciones[0].IdDireccion == 0)|| (IdUsuario == 0 && Direcciones[0].IdDireccion == 0)}">
-
+                      <p class="fw-bold text-uppercase fs-3 text-center ">DIRECCION</p>   
                         <hr>
 
                         <div class="row mb-3">
@@ -218,10 +218,15 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-outline-success mt-4 w-100 fw-bold ">Agregar</button> 
-
-                        </form>
                     </div>
+                    <div>
+                        <button type="submit" class="btn btn-success mt-4 w-100 fw-bold " th:if="*{IdUsuario == 0 && Direcciones[0].IdDireccion == 0}">Agregar</button> 
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-warning mt-4 w-100 fw-bold " th:if="*{(IdUsuario >0 && Direcciones[0].IdDireccion == -1)}">GUARDAR</button> 
+                    </div>
+            
+            </form>
 
                     <script>
                         function SoloLetras(event, input) {
