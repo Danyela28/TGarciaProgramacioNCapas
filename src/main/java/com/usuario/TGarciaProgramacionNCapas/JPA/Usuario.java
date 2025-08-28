@@ -56,6 +56,33 @@ public class Usuario {
     @OneToMany(mappedBy="Usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Direccion>Direcciones = new ArrayList<>();
     
+    public Usuario(com.usuario.TGarciaProgramacionNCapas.ML.Usuario usuarioML){
+        this.Nombre = usuarioML.getNombre();
+        this.ApellidoPaterno = usuarioML.getApellidoPaterno();
+        this.ApellidoMaterno = usuarioML.getApellidoMaterno();
+        this.FechaNacimiento = usuarioML.getFechaNacimiento();
+        this.Celular = usuarioML.getCelular();
+        this.UserName = usuarioML.getUserName();
+        this.Email = usuarioML.getEmail();
+        this.Password = usuarioML.getPassword();
+        this.Sexo = usuarioML.getSexo();
+        this.Telefono = usuarioML.getTelefono();
+        this.CURP = usuarioML.getCURP();
+        this.Imagen = usuarioML.getImagen();
+        this.Rol = new Rol();
+        this.Rol.setIdRol(usuarioML.Rol.getIdRol());
+        for (com.usuario.TGarciaProgramacionNCapas.ML.Direccion Direction : usuarioML.Direcciones ){
+            Direccion direccion = new Direccion();
+            direccion.setCalle(Direction.getCalle());
+            direccion.setNumeroExterior(Direction.getNumeroExterior());
+            direccion.setNumeroInterior(Direction.getNumeroInterior());
+            direccion.colonia = new Colonia();
+            direccion.colonia.setIdColonia(Direction.colonia.getIdColonia());
+            direccion.Usuario = this;
+            
+            Direcciones.add(direccion);
+        }
+    }
 
     
     

@@ -8,5 +8,5 @@ public interface IUsuarioJPADAO {
     
     Result GetAll();
     Result Add(com.usuario.TGarciaProgramacionNCapas.ML.Usuario usuarioML);
-    
+    Result Delete(int IdUsuario);
 }

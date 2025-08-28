@@ -51,7 +51,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
         
         try{
             Usuario usuarioJPA = new Usuario(usuarioML);
-            entityManaher.persist(usuarioJPA);
+            entityManager.persist(usuarioJPA);
             result.correct = true;
         }catch (Exception ex){
             result.correct = false;
@@ -60,6 +60,25 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
         }
         return result;
         
+    }
+    
+    @Transactional
+    @Override
+    public Result Delete(int IdUsuario){
+        Result result = new Result();
+        
+        try{
+            Usuario usuarioJPA = entityManager.find(Usuario.class, IdUsuario);
+            entityManager.remove(usuarioJPA);
+            
+            result.correct=true;
+            
+        }catch(Exception ex){
+            result.correct=false;
+            result.errorMessage=ex.getLocalizedMessage();
+            result.ex=ex;
+        }
+        return result;
     }
     
 }

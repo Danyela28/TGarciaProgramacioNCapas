@@ -55,6 +55,7 @@ public class UsuarioController {
     private UsuarioDAOImplementation usuarioDAOImplementation;
     @Autowired
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
+    
     @Autowired
     private RolDAOImplementation rolDAOImplementation;
 
@@ -187,7 +188,7 @@ public class UsuarioController {
             model.addAttribute("Usuario", usuario);
             return "UsuarioForm";
         } else {
-            if (imagen != null) {
+            if (imagen != null && imagen.getOriginalFilename() != "") {
                 String nombre = imagen.getOriginalFilename();
                 String extension = nombre.split("\\.")[1];
                 if (extension.equals("jpg"))
@@ -200,31 +201,37 @@ public class UsuarioController {
                 }
             }
         }
-        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
+//        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
+        Result result = usuarioJPADAOImplementation.Add(usuario);
         return "redirect:/usuario";
-
+        }
+    
+    @GetMapping("delete/{IdUsuario}")
+    public String Delete(@PathVariable("IdUsuario")int IdUsuario){
+    
+        Result result = usuarioJPADAOImplementation.Delete(IdUsuario);
+    
+        return "redirec:/usuario";
     }
+    @GetMapping("delete/{IdDireccion")
 
     @GetMapping("getEstadosByIdPais/{IdPais}")
     @ResponseBody
-    public Result EstadoByPais(@PathVariable int IdPais
-    ) {
+    public Result EstadoByPais(@PathVariable int IdPais) {
 
         return estadoDAOImplementation.EstadoByPais(IdPais);
     }
 
     @GetMapping("getMunicipiosByIdEstado/{IdEstado}")
     @ResponseBody
-    public Result MunicipioByEstado(@PathVariable int IdEstado
-    ) {
+    public Result MunicipioByEstado(@PathVariable int IdEstado) {
 
         return municipioDAOImplementation.MunicipioByEstado(IdEstado);
     }
 
     @GetMapping("getColoniasByIdMunicipio/{IdMunicipio}")
     @ResponseBody
-    public Result ColoniaByMunicipio(@PathVariable int IdMunicipio
-    ) {
+    public Result ColoniaByMunicipio(@PathVariable int IdMunicipio) {
 
         return coloniaDAOImplementation.ColoniaByMunicipio(IdMunicipio);
     }
