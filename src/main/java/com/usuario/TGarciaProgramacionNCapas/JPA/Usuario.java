@@ -71,7 +71,11 @@ public class Usuario {
         this.Imagen = usuarioML.getImagen();
         this.Rol = new Rol();
         this.Rol.setIdRol(usuarioML.Rol.getIdRol());
-        for (com.usuario.TGarciaProgramacionNCapas.ML.Direccion Direction : usuarioML.Direcciones ){
+        if(usuarioML.Direcciones.get(0).getIdDireccion() == -1){
+            
+            usuarioML.Direcciones = null;   
+        }else{
+            for (com.usuario.TGarciaProgramacionNCapas.ML.Direccion Direction : usuarioML.Direcciones ){
             Direccion direccion = new Direccion();
             direccion.setCalle(Direction.getCalle());
             direccion.setNumeroExterior(Direction.getNumeroExterior());
@@ -83,11 +87,8 @@ public class Usuario {
             Direcciones.add(direccion);
         }
     }
-
-    
-    
-    
-    
+}
+            
     public Usuario(){}
     
     

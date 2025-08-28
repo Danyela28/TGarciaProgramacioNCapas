@@ -1,10 +1,16 @@
 package com.usuario.TGarciaProgramacionNCapas.Controller;
 
 import com.usuario.TGarciaProgramacionNCapas.DAO.ColoniaDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.ColoniaJPADAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.DireccionJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.EstadoDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.EstadoJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.MunicipioDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.MunicipioJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.PaisDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.PaisJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.RolDAOImplementation;
+import com.usuario.TGarciaProgramacionNCapas.DAO.RolJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.UsuarioDAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.DAO.UsuarioJPADAOImplementation;
 import com.usuario.TGarciaProgramacionNCapas.ML.Colonia;
@@ -57,19 +63,37 @@ public class UsuarioController {
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
     
     @Autowired
+    private RolJPADAOImplementation rolJPADAOImplementation;
+    
+    @Autowired
     private RolDAOImplementation rolDAOImplementation;
 
     @Autowired
     private PaisDAOImplementation paisDAOImplementation;
+    
+    @Autowired
+    private PaisJPADAOImplementation paisJPADAOImplementation;
 
     @Autowired
     private EstadoDAOImplementation estadoDAOImplementation;
+    
+    @Autowired
+    private EstadoJPADAOImplementation estadoJPADAOImplementation;
 
     @Autowired
     private MunicipioDAOImplementation municipioDAOImplementation;
+    
+    @Autowired
+    private MunicipioJPADAOImplementation municipioJPADAOImplementation;
 
     @Autowired
     private ColoniaDAOImplementation coloniaDAOImplementation;
+    
+    @Autowired
+    private ColoniaJPADAOImplementation coloniaJPADAOImplementation;
+    
+    @Autowired
+    private DireccionJPADAOImplementation direccionJPADAOImplementation;
 
     @GetMapping
     public String Index(Model model) {
@@ -83,7 +107,8 @@ public class UsuarioController {
 
         if (result.correct) {
             model.addAttribute("usuarios", result.objects);
-            model.addAttribute("roles", rolDAOImplementation.GetAll().objects);
+            model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
+//            model.addAttribute("roles", rolDAOImplementation.GetAll().objects);
         } else {
             model.addAttribute("usuario", null);
         }
@@ -106,10 +131,12 @@ public class UsuarioController {
     public String add(Model model, @PathVariable("IdUsuario") int IdUsuario) {
 
         if (IdUsuario == 0) {
-            Result result = rolDAOImplementation.GetAll();
+//            Result result = rolDAOImplementation.GetAll();
+              Result result = rolJPADAOImplementation.GetAll();
 
             model.addAttribute("roles", result.objects);
-            model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
+            model.addAttribute("paises", paisJPADAOImplementation.GetAll());
+//            model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
             model.addAttribute("Usuario", new Usuario());
 
             return "UsuarioForm";
@@ -188,23 +215,51 @@ public class UsuarioController {
             model.addAttribute("Usuario", usuario);
             return "UsuarioForm";
         } else {
-            if (imagen != null && imagen.getOriginalFilename() != "") {
-                String nombre = imagen.getOriginalFilename();
-                String extension = nombre.split("\\.")[1];
-                if (extension.equals("jpg"))
-                    try {
-                    byte[] bytes = imagen.getBytes();
-                    String base64Image = Base64.getEncoder().encodeToString(bytes);
-                    usuario.setImagen(base64Image);
-                } catch (Exception ex) {
-                    System.out.println("error");
-                }
+            
+            if(usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion()>0){
+                Result result = direccionJPADAOImplementation.UpDate(usuario);
+       
+            }else if(usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion() == -1){
+                    if (imagen != null && imagen.getOriginalFilename() != "") {
+                        String nombre = imagen.getOriginalFilename();
+                        String extension = nombre.split("\\.")[1];
+                        if (extension.equals("jpg"))
+                            try {
+                                byte[] bytes = imagen.getBytes();
+                                String base64Image = Base64.getEncoder().encodeToString(bytes);
+                                usuario.setImagen(base64Image);
+                        } catch (Exception ex) {
+                            System.out.println("error");
+                        }
+                    }
+                
+             Result result = usuarioJPADAOImplementation.UpDate(usuario);
+        
+            }else if(usuario.getIdUsuario() == 0 && usuario.Direcciones.get(0).getIdDireccion() == 0){
+                    if (imagen != null && imagen.getOriginalFilename() != "") {
+                        String nombre = imagen.getOriginalFilename();
+                        String extension = nombre.split("\\.")[1];
+                        if (extension.equals("jpg"))
+                            try {
+                                byte[] bytes = imagen.getBytes();
+                                String base64Image = Base64.getEncoder().encodeToString(bytes);
+                                usuario.setImagen(base64Image);
+                        } catch (Exception ex) {
+                            System.out.println("error");
+                        }
+                    }
+                
+                Result result = usuarioJPADAOImplementation.Add(usuario);
+        
+            }else if (usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion() == 0){
+            
             }
-        }
 //        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
         Result result = usuarioJPADAOImplementation.Add(usuario);
         return "redirect:/usuario";
         }
+    }
+
     
     @GetMapping("delete/{IdUsuario}")
     public String Delete(@PathVariable("IdUsuario")int IdUsuario){
@@ -213,7 +268,7 @@ public class UsuarioController {
     
         return "redirec:/usuario";
     }
-    @GetMapping("delete/{IdDireccion")
+    
 
     @GetMapping("getEstadosByIdPais/{IdPais}")
     @ResponseBody
@@ -233,7 +288,7 @@ public class UsuarioController {
     @ResponseBody
     public Result ColoniaByMunicipio(@PathVariable int IdMunicipio) {
 
-        return coloniaDAOImplementation.ColoniaByMunicipio(IdMunicipio);
+        return coloniaJPADAOImplementation.ColoniaByMunicipio(IdMunicipio);
     }
 
     @GetMapping("cargamasiva")

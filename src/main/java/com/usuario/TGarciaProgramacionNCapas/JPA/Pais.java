@@ -19,8 +19,12 @@ public class Pais {
 
     public Pais() {
     }
-    public Pais(int aInt, String string) {
+    
+    public Pais(com.usuario.TGarciaProgramacionNCapas.ML.Pais paisML){
+        this.IdPais = paisML.getIdPais();
+        this.Nombre = paisML.getNombre();
     }
+    
     
     public int getIdPais(){
         return IdPais;

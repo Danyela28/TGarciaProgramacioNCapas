@@ -10,6 +10,10 @@ public class Pais {
 
     public Pais() {
     }
+
+    public Pais(com.usuario.TGarciaProgramacionNCapas.JPA.Pais pais) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
     
     public int getIdPais(){

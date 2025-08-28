@@ -25,6 +25,15 @@ public class Colonia {
     public Municipio Municipio;
     
     
+    public Colonia(){}
+    
+    public Colonia(com.usuario.TGarciaProgramacionNCapas.ML.Colonia coloniaML){
+        this.IdColonia = coloniaML.getIdColonia();
+        this.Nombre = coloniaML.getNombre();
+        this.Municipio = new Municipio();
+        this.Municipio.setIdMunicipio(coloniaML.Municipio.getIdMunicipio());
+    }
+    
     public int getIdColonia(){
         return IdColonia;
     }

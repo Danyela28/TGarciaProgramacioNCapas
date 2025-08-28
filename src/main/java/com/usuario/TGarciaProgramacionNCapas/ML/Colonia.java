@@ -6,6 +6,14 @@ public class Colonia {
     private String Nombre;
     private String CodigoPostal;
     public Municipio Municipio;
+
+    public Colonia(com.usuario.TGarciaProgramacionNCapas.JPA.Colonia colonia) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Colonia() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
     
     public int getIdColonia(){

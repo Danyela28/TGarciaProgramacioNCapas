@@ -30,10 +30,23 @@ public class Direccion {
     @JoinColumn(name="idusuario", nullable = false)
     public Usuario Usuario;
 
-    
-
    
     public Direccion(){}
+    
+    public Direccion(com.usuario.TGarciaProgramacionNCapas.ML.Usuario usuarioML){
+        
+        com.usuario.TGarciaProgramacionNCapas.ML.Direccion direccionML = usuarioML.Direcciones.get(0);
+        
+        this.IdDireccion=direccionML.getIdDireccion();
+        this.Calle = direccionML.getCalle();
+        this.NumeroExterior = direccionML.getNumeroExterior();
+        this.NumeroInterior = direccionML.getNumeroInterior();
+        this.colonia = new Colonia();
+        this.colonia.setIdColonia(direccionML.colonia.getIdColonia());
+        this.Usuario = new Usuario();
+        this.Usuario.setIdUsuario(usuarioML.getIdUsuario());
+        
+    }
     
     public Direccion(int IdDireccion) {
         this.IdDireccion = IdDireccion;

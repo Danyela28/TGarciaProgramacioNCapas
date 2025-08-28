@@ -31,13 +31,12 @@ public class RolJPADAOImplementation implements IRolJPADAO {
             result.objects = new ArrayList<>();
 
             for (Rol rol : roles) {
-                com.usuario.TGarciaProgramacionNCapas.ML.Rol rolML = new com.usuario.TGarciaProgramacionNCapas.ML.Rol();
-                
+                result.objects.add(new com.usuario.TGarciaProgramacionNCapas.ML.Rol(rol));
             }
 
             System.out.println(result.objects.size());
             result.correct = true;
-        } catch (Exception ex) {s
+        } catch (Exception ex) {
             System.out.println(ex.getLocalizedMessage());
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();

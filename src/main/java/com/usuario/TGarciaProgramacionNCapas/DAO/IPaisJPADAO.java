@@ -6,5 +6,5 @@ import com.usuario.TGarciaProgramacionNCapas.ML.Result;
 
 public interface IPaisJPADAO {
     
-    Result GetAllP();
+    Result GetAll();
 }

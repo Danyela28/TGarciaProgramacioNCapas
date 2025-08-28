@@ -80,5 +80,47 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
         }
         return result;
     }
+    @Transactional
+    @Override
+    public Result UpDate(com.usuario.TGarciaProgramacionNCapas.ML.Usuario usuarioML) {
+        
+        Result result = new Result();
+        
+        try{
+            Usuario usuarioJPA = new Usuario(usuarioML);
+            Usuario usuarioBD = entityManager.find(Usuario.class, usuarioML.getIdUsuario());
+            
+            usuarioJPA.Direcciones = usuarioBD.Direcciones;
+            
+            entityManager.merge(usuarioJPA);
+            
+            result.correct=true;
+            
+        }catch(Exception ex){
+            result.correct=false;
+            result.errorMessage= ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+    
+    @Override
+    public Result GetById(int IdUsuario){
+        Result result = new Result();
+        
+        try{
+            
+            Usuario usuarioJPA = entityManager.find(Usuario.class, IdUsuario);
+            com.usuario.TGarciaProgramacionNCapas.ML.Usuario usuarioML = new com.usuario.TGarciaProgramacionNCapas.ML.Usuario(usuarioJPA);
+            result.object = usuarioML;
+            result.correct=true;
+            
+        }catch(Exception ex){
+            result.correct=false;
+            result.errorMessage=ex.getLocalizedMessage();
+            result.ex=ex;
+        }
+        return result;
+    }
     
 }

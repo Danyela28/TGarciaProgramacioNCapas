@@ -21,6 +21,14 @@ public class Estado {
     @JoinColumn(name="idpais")
     public Pais Pais;
     
+    public Estado(){}
+    
+    public Estado(com.usuario.TGarciaProgramacionNCapas.ML.Estado estadoML){
+        this.IdEstado = estadoML.getIdEstado();
+        this.Nombre = estadoML.getNombre();
+        this.Pais = new Pais();
+        this.Pais.setIdPais(estadoML.Pais.getIdPais());
+    }
     
     public int getIdEstado(){
         return IdEstado;

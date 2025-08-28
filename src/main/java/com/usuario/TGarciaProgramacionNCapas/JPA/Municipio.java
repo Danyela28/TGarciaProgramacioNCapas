@@ -22,6 +22,15 @@ public class Municipio {
     @JoinColumn(name="idestado")
     public Estado Estado;
     
+    public Municipio(){}
+    
+    public Municipio(com.usuario.TGarciaProgramacionNCapas.ML.Municipio municipioML){
+        this.IdMunicipio = municipioML.getIdMunicipio();
+        this.Nombre = municipioML.getNombre();
+        this.Estado = new Estado();
+        this.Estado.setIdEstado(municipioML.getIdMunicipio());
+        
+    }
     public int getIdMunicipio(){
         return IdMunicipio;
     }

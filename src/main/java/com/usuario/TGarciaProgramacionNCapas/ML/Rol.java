@@ -15,6 +15,10 @@ public class Rol {
         this.IdRol= IdRol;
     }
 
+    public Rol(com.usuario.TGarciaProgramacionNCapas.JPA.Rol rol) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public int getIdRol() {
         return IdRol;
     }
